@@ -3,168 +3,438 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sanal Keşif | Pro Motor</title>
+    <title>Sanal Keşif | Premium Koleksiyon</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <style>
-        :root { --bg-dark: #050505; --glass-bg: rgba(22, 22, 24, 0.85); --glass-border: 1px solid rgba(255, 255, 255, 0.15); --gold: #D4AF37; --text-main: #ffffff; --text-muted: #a1a1aa; }
-        body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); height: 100vh; }
-        model-viewer { width: 100vw; height: 100vh; --poster-color: transparent; outline: none; }
-        .ui-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; z-index: 10; }
+        :root {
+            --bg-dark: #050505;
+            --glass-bg: rgba(22, 22, 24, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.15);
+            --gold: #D4AF37;
+            --whatsapp-green: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 90%);
+            color: var(--text-main);
+            height: 100vh;
+        }
+
+        /* 3D Sahne */
+        model-viewer {
+            width: 100vw;
+            height: 100vh;
+            --poster-color: transparent;
+            outline: none;
+        }
+
+        /* Arayüz Katmanı */
+        .ui-layer {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: auto;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .brand {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: var(--glass-border);
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+        .brand span { color: var(--gold); }
+
+        .fav-btn {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: var(--glass-border);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            pointer-events: auto;
+        }
         
-        /* Üst Menü */
-        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; pointer-events: auto; padding-top: env(safe-area-inset-top); }
-        .brand { background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); padding: 8px 18px; border-radius: 20px; border: var(--glass-border); font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; }
-        .fav-btn { background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); border: var(--glass-border); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;}
-        
+        .fav-btn svg { width: 20px; height: 20px; stroke: white; fill: none; transition: 0.3s; }
+        .fav-btn.active svg { fill: var(--gold); stroke: var(--gold); }
+        .fav-btn:active { transform: scale(0.9); }
+
         /* Alt Panel */
-        .bottom-panel { pointer-events: auto; position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; padding-bottom: env(safe-area-inset-bottom); }
-        .info-card { background: var(--glass-bg); backdrop-filter: blur(25px); border: var(--glass-border); border-radius: 24px; padding: 18px; box-shadow: 0 25px 50px rgba(0,0,0,0.7); display: flex; flex-direction: column; gap: 15px; }
-        .upper-row { display: flex; align-items: center; justify-content: space-between; }
-        .nav-btn { width: 45px; height: 45px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s;}
-        .nav-btn:active { background: white; color: black; }
-        .text-content { flex: 1; text-align: center; display: flex; flex-direction: column; padding: 0 10px; }
-        .product-title { font-family: 'Playfair Display', serif; font-size: 20px; margin: 4px 0; line-height: 1.2; }
-        .price { font-size: 15px; font-weight: 700; color: var(--gold); }
-        .size-info { font-size: 12px; color: var(--text-muted); }
+        .bottom-panel {
+            pointer-events: auto;
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 380px;
+            z-index: 20;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .info-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: var(--glass-border);
+            border-radius: 24px;
+            padding: 15px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .upper-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+        .nav-btn:active { background: white; color: black; transform: scale(0.95); }
+
+        .text-content {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        .category-tag {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin: 0;
+            color: white;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-meta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .price { font-size: 15px; font-weight: 700; color: #fff; }
+        .size-info { font-size: 12px; color: var(--text-muted); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 8px; }
+
+        .action-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-ar {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: white;
+            padding: 12px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            cursor: pointer;
+        }
+
+        .btn-whatsapp {
+            flex: 1.5;
+            background: var(--whatsapp-green);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            text-decoration: none;
+            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.2);
+        }
         
-        .action-row { display: flex; gap: 8px; }
-        .btn-ar { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 12px; border-radius: 14px; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; }
-        .btn-whatsapp { flex: 1.5; background: #25D366; color: white; padding: 12px; border-radius: 14px; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .btn-whatsapp:active, .btn-ar:active { transform: scale(0.97); }
+
+        /* Yükleniyor Ekranı */
+        #loader {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: #000; z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
         
-        #loader { position: absolute; top:0; left:0; width:100%; height:100%; background: var(--bg-dark); z-index: 100; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .spinner { width: 35px; height: 35px; border: 3px solid #333; border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .spinner {
+            width: 35px; height: 35px; border: 3px solid #333;
+            border-top: 3px solid var(--gold); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="spinner"></div></div>
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
 
-    <model-viewer id="ar-gosterici"
+    <model-viewer id="hali-gosterici"
         ar ar-modes="webxr scene-viewer quick-look"
         camera-controls 
         environment-image="neutral"
         shadow-intensity="1.5" 
-        auto-rotate>
+        shadow-softness="0.8"
+        exposure="1"
+        auto-rotate
+        rotation-per-second="10deg">
+        
         <button slot="ar-button" style="display: none;"></button>
 
         <div class="ui-layer">
+            
             <div class="top-bar">
-                <div class="brand">Sanal<span>Keşif</span></div>
-                <div class="fav-btn" onclick="favoriToggle()"><svg width="20" height="20" stroke="white" fill="none" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+                <div class="brand">Fth<span>AR</span></div>
+                <div class="fav-btn" onclick="favoriToggle()">
+                    <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                </div>
             </div>
 
             <div class="bottom-panel">
                 <div class="info-card">
+                    
                     <div class="upper-row">
                         <div class="nav-btn" onclick="degistir(-1)">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         </div>
+
                         <div class="text-content">
-                            <span class="size-info" id="urun-seri">KATEGORİ</span>
+                            <span class="category-tag" id="urun-seri">KATEGORİ</span>
                             <h1 class="product-title" id="urun-adi">Yükleniyor...</h1>
-                            <div><span class="price" id="urun-fiyat">0 TL</span> <span class="size-info" id="urun-olcu"></span></div>
+                            <div class="product-meta">
+                                <span class="price" id="urun-fiyat">0 TL</span>
+                                <span class="size-info" id="urun-olcu">0 x 0 cm</span>
+                            </div>
                         </div>
+
                         <div class="nav-btn" onclick="degistir(1)">
-                            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </div>
                     </div>
 
                     <div class="action-row">
-                        <button class="btn-ar" onclick="arBaslat()">Evde Gör</button>
-                        <a id="wp-link" href="#" target="_blank" class="btn-whatsapp">Sipariş Ver</a>
+                        <button class="btn-ar" onclick="arBaslat()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3M21 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3M10 12h4"></path></svg>
+                            Mekanda Gör
+                        </button>
+                        
+                        <a id="wp-link" href="#" target="_blank" class="btn-whatsapp">
+                            <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.004-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg>
+                            WhatsApp'tan Sor
+                        </a>
                     </div>
                 </div>
             </div>
+
         </div>
     </model-viewer>
 
     <script>
+        // --- AYARLAR ---
         const KULLANICI = "fthlabz";
         const REPO = "fth-ar"; 
-        const WP_NUMARA = "905XXXXXXXXXX"; 
+        const WP_NUMARA = "905XXXXXXXXXX"; // Kendi numaranı buraya gir!
         
+        // --- DEĞİŞKENLER ---
         let vitrin = [];
         let aktifIndex = 0;
-        const mv = document.getElementById('ar-gosterici');
+        const mv = document.getElementById('hali-gosterici');
         const loader = document.getElementById('loader');
+        
+        // 2D Görseller (Halı/Tablo) için zemin kutusu
         const TEMEL_KUTU = "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/BoxTextured/glTF-Binary/BoxTextured.glb";
 
+        // --- BAŞLATMA ---
         async function vitriniGetir() {
             try {
                 const cevap = await fetch(`https://raw.githubusercontent.com/${KULLANICI}/${REPO}/main/vitrin.json?t=${Date.now()}`);
                 if (cevap.ok) {
                     vitrin = await cevap.json();
-                    if(vitrin.length > 0) urunuBas(0);
-                    else loader.innerHTML = "<p style='color:white'>Vitrin boş.</p>";
+                    if(vitrin.length > 0) {
+                        urunuBas(0);
+                    } else {
+                        loader.innerHTML = "<p style='color:white'>Vitrin boş.</p>";
+                    }
                 }
-            } catch (e) {}
+            } catch (e) { 
+                console.error("Veri hatası", e); 
+            }
         }
 
+        // --- AR MOTORU: ÜRÜN YÜKLEME VE GÖSTERME ---
         async function urunuBas(index) {
             const urun = vitrin[index];
             if (!urun) return;
 
-            // Metinleri Güncelle
-            document.getElementById('urun-adi').innerText = urun.ad || "";
-            document.getElementById('urun-seri').innerText = urun.seri || "";
-            document.getElementById('urun-fiyat').innerText = urun.fiyat || "";
-            document.getElementById('urun-olcu').innerText = urun.tip === '3dmodel' ? "3D Model" : `${urun.en}x${urun.boy} cm`;
+            // 1. Yazıları Güncelle
+            document.getElementById('urun-adi').innerText = urun.ad || "Özel Koleksiyon";
+            document.getElementById('urun-seri').innerText = urun.seri || "GENEL";
+            document.getElementById('urun-fiyat').innerText = urun.fiyat || "Fiyat Sorunuz";
             
-            document.getElementById('wp-link').href = `https://api.whatsapp.com/send?phone=${WP_NUMARA}&text=${encodeURIComponent('Model: ' + urun.ad)}`; 
+            // Eğer 3D model ise boyut göstermiyoruz
+            document.getElementById('urun-olcu').innerText = urun.tip === '3dmodel' ? "3D Model" : `${urun.en} x ${urun.boy} cm`;
+            
+            // 2. WhatsApp Linkini Güncelle
+            const mesaj = `Merhaba, Sanal Keşif'te gördüğüm şu ürün hakkında bilgi almak istiyorum:\n\n*Model:* ${urun.ad}\n*Fiyat:* ${urun.fiyat}\n*Kategori:* ${urun.seri}`;
+            document.getElementById('wp-link').href = `https://api.whatsapp.com/send?phone=${WP_NUMARA}&text=${encodeURIComponent(mesaj)}`; 
 
-            // AR MOTORU MANTIK AYRIMI
+            // 3. Modeli ve AR Mantığını Güncelle
             try {
                 if (urun.tip === '3dmodel') {
-                    // GERÇEK 3D OBJELER (.glb dosyaları)
+                    // GERÇEK 3D MOBİLYA/OBJE MANTIĞI
                     mv.src = urun.url;
                     mv.setAttribute('ar-placement', 'floor');
                     mv.scale = "1 1 1";
                 } 
                 else if (urun.tip === 'tablo') {
-                    // TABLO / DUVAR (İnce Kutu + Duvara Yapışma)
+                    // TABLO / DUVAR MANTIĞI
                     mv.src = TEMEL_KUTU;
-                    mv.setAttribute('ar-placement', 'wall'); // Telefon kamerası duvar arayacak
-                    mv.scale = `${urun.en / 100} ${urun.boy / 100} 0.02`; // x, y, z(kalınlık 2cm)
+                    mv.setAttribute('ar-placement', 'wall'); // Telefon duvar arayacak
+                    mv.scale = `${urun.en / 100} ${urun.boy / 100} 0.02`; // z değeri tablo kalınlığı (2cm)
                     await dokuKapla(urun.url);
                 } 
                 else {
-                    // HALI / ZEMİN (Yere Yapışma)
+                    // HALI / ZEMİN MANTIĞI (Varsayılan)
                     mv.src = TEMEL_KUTU;
-                    mv.setAttribute('ar-placement', 'floor');
-                    mv.scale = `${urun.en / 100} 0.01 ${urun.boy / 100}`; // x, y(kalınlık 1cm), z
+                    mv.setAttribute('ar-placement', 'floor'); // Telefon zemin arayacak
+                    mv.scale = `${urun.en / 100} 0.01 ${urun.boy / 100}`; // y değeri halı kalınlığı (1cm)
                     await dokuKapla(urun.url);
                 }
                 
+                favKontrol(urun.id);
+                
+                // Yüklenme animasyonunu yumuşakça kapat
                 loader.style.opacity = '0';
                 setTimeout(() => loader.style.display = 'none', 300);
-            } catch (error) { console.log(error); }
+
+            } catch (error) {
+                console.log("Model veya Doku Hatası", error);
+            }
         }
 
+        // Texture (Görsel) Kaplama İşlemi
         async function dokuKapla(url) {
-            // Model Viewer'ın kaplama fonksiyonu
-            await new Promise(r => setTimeout(r, 100)); // modelin yüklenmesini bekle
+            // Model Viewer'ın kaplama fonksiyonunun hazır olması için ufak bir bekleme
+            await new Promise(r => setTimeout(r, 100)); 
             if (!mv.model || !mv.model.materials) return;
+            
             const texture = await mv.createTexture(url);
             const material = mv.model.materials[0];
+            
             material.pbrMetallicRoughness.baseColorTexture.setTexture(texture);
             material.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 1]);
         }
 
+        // --- NAVİGASYON ---
         window.degistir = function(yon) {
             if (vitrin.length === 0) return;
-            loader.style.display = 'flex'; loader.style.opacity = '1';
+            
+            // Geçiş sırasında loader'ı göster
+            loader.style.display = 'flex'; 
+            loader.style.opacity = '1';
+            
             aktifIndex += yon;
             if (aktifIndex >= vitrin.length) aktifIndex = 0;
             if (aktifIndex < 0) aktifIndex = vitrin.length - 1;
             urunuBas(aktifIndex);
         }
 
-        window.arBaslat = function() { mv.activateAR(); }
+        // --- AR BUTONU ---
+        window.arBaslat = function() {
+            mv.activateAR();
+        }
+
+        // --- FAVORİ SİSTEMİ ---
+        function favoriToggle() {
+            const urun = vitrin[aktifIndex];
+            if(!urun) return;
+
+            let favlar = JSON.parse(localStorage.getItem('favHalis') || "[]");
+            const index = favlar.indexOf(urun.id);
+
+            if (index > -1) {
+                favlar.splice(index, 1);
+                document.querySelector('.fav-btn').classList.remove('active');
+            } else {
+                favlar.push(urun.id);
+                document.querySelector('.fav-btn').classList.add('active');
+            }
+            localStorage.setItem('favHalis', JSON.stringify(favlar));
+        }
+
+        function favKontrol(id) {
+            let favlar = JSON.parse(localStorage.getItem('favHalis') || "[]");
+            if(favlar.includes(id)) {
+                document.querySelector('.fav-btn').classList.add('active');
+            } else {
+                document.querySelector('.fav-btn').classList.remove('active');
+            }
+        }
+
         mv.addEventListener('load', vitriniGetir);
         setTimeout(() => { if(vitrin.length===0) vitriniGetir(); }, 1000);
+
     </script>
 </body>
 </html>
