@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Yönetim Paneli | Premium AR Showroom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        /* ... (CSS kısmın harika, aynı bırakıyoruz, sadece ufak renk rötuşları yapabilirsin) ... */
+        :root {
+            --bg-dark: #09090b; --card-glass: rgba(30, 30, 30, 0.65);
+            --input-bg: rgba(255, 255, 255, 0.08); --accent-color: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.4); --text-main: #ffffff;
+            --text-muted: #a1a1aa; --danger: #ef4444; --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: radial-gradient(circle at 50% 0%, #1e1e24 0%, var(--bg-dark) 80%); color: var(--text-main); min-height: 100vh; padding: 20px; overflow-x: hidden; }
+        .container { max-width: 550px; margin: 0 auto; padding-bottom: 50px; }
+        header { text-align: center; margin-bottom: 30px; padding-top: 20px; }
+        h2 { font-weight: 800; font-size: 26px; margin: 0; }
+        .subtitle { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
+        .glass-card { background: var(--card-glass); backdrop-filter: blur(20px); border-radius: 24px; border: var(--border-glass); padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); margin-bottom: 25px; }
+        .upload-area { display: flex; flex-direction: column; gap: 15px; }
+        .file-upload-wrapper { position: relative; width: 100%; height: 140px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2); overflow: hidden; }
+        .file-upload-wrapper input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;}
+        #previewImg { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; border-radius: 16px; opacity: 0.6; z-index: 1; display: none; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        input[type="text"], input[type="number"] { background: var(--input-bg); border: var(--border-glass); color: white; padding: 16px; border-radius: 14px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
+        .full-width { grid-column: span 2; }
+        .btn-main { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
+        #statusText { text-align: center; color: var(--accent-color); font-size: 13px; margin-top: 15px; display: none; font-weight: 600; }
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
+        .product-item { display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 16px; margin-bottom: 12px; }
+        .thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; margin-right: 15px; }
+        .info { flex: 1; }
+        .info h4 { margin: 0 0 4px 0; font-size: 15px; }
+        .info p { margin: 0; font-size: 12px; color: var(--text-muted); }
+        .btn-del { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: none; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h2>YÖNETİM PANELİ</h2>
+        <div class="subtitle">Evrensel AR Vitrin Düzenleyici</div>
+    </header>
+
+    <div class="glass-card upload-area">
+        <div class="file-upload-wrapper">
+            <span class="icon-cam">📸</span>
+            <span class="upload-text">Ürün Görseli Seç</span>
+            <img id="previewImg">
+            <input type="file" id="fileInput" accept="image/*" onchange="onFileSelected(this)">
+        </div>
+
+        <div class="input-grid">
+            <input type="text" id="urunAdi" class="full-width" placeholder="Ürün Adı" required>
+            <input type="text" id="seri" placeholder="Kategori" required>
+            <input type="text" id="fiyat" placeholder="Fiyat" required>
+            <input type="number" id="enInput" placeholder="En (cm)" required>
+            <input type="number" id="boyInput" placeholder="Boy (cm)" required>
+            <input type="text" id="slogan" class="full-width" placeholder="Kısa Açıklama / Slogan">
+        </div>
+
+        <button class="btn-main" onclick="urunuYukle()">VİTRİNE EKLE</button>
+        <div id="statusText">İşlem Yapılıyor...</div>
+    </div>
+
+    <div class="list-header">
+        <h3>Yayındaki Ürünler</h3>
+        <span class="badge" id="countBadge" style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px;">0</span>
+    </div>
+    <div id="productList"></div>
+</div>
+
+<script>
+    // --- GITHUB AYARLARI ---
+    const KULLANICI = "fthlabz"; 
+    const REPO = "sanal-kesif"; 
+    
+    // --- HAYALET KİLİT MİMARİSİ ---
+    const sifreliKasa = "U2FsdGVkX19mc0X7xpzonbEzWQgJl2dp+4Oqrqhg6zeA49eOwhvOSgJsBs2IQkLhw61Ilvvd6nS1CVjkJ+0bnA=="; 
+    const gizliPin = "1453"; 
+    const bytes = CryptoJS.AES.decrypt(sifreliKasa, gizliPin);
+    const githubToken = bytes.toString(CryptoJS.enc.Utf8); 
+    // -----------------------
+
+    let vitrin = [];
+
+    function onFileSelected(input) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('previewImg');
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    async function sistemiBaslat() {
+        try {
+            const cevap = await fetch(`https://raw.githubusercontent.com/${KULLANICI}/${REPO}/main/vitrin.json?t=${Date.now()}`);
+            if (cevap.ok) { vitrin = await cevap.json(); vitriniCiz(); }
+        } catch (e) { console.log("Veri okunamadı."); }
+    }
+    sistemiBaslat();
+
+    async function urunuYukle() {
+        const file = document.getElementById('fileInput').files[0];
+        const ad = document.getElementById('urunAdi').value;
+        const fiyat = document.getElementById('fiyat').value;
+        const seri = document.getElementById('seri').value;
+        const en = document.getElementById('enInput').value;
+        const boy = document.getElementById('boyInput').value;
+        const slogan = document.getElementById('slogan').value;
+
+        if (!file || !ad || !fiyat || !en || !boy) { 
+            alert("Lütfen resim, ürün adı, fiyat ve ölçüleri eksiksiz girin."); 
+            return; 
+        }
+
+        const statusText = document.getElementById('statusText');
+        statusText.style.display = "block";
+        statusText.innerText = "Görsel Optimize Ediliyor... ⚙️";
+
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.src = url;
+
+        img.onload = async function() {
+            URL.revokeObjectURL(url);
+            
+            const canvas = document.createElement('canvas');
+            const MAX_BOYUT = 1500;
+            let w = img.width, h = img.height;
+            if (w > h) { if (w > MAX_BOYUT) { h *= MAX_BOYUT/w; w = MAX_BOYUT; } }
+            else { if (h > MAX_BOYUT) { w *= MAX_BOYUT/h; h = MAX_BOYUT; } }
+            
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            
+            const base64Content = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+            const dosyaAdi = `urun_${Date.now()}.jpg`;
+
+            statusText.innerText = "Buluta Yükleniyor... ☁️";
+
+            try {
+                const resimCevap = await fetch(`https://api.github.com/repos/${KULLANICI}/${REPO}/contents/images/${dosyaAdi}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${githubToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Sanal Kesif Upload", content: base64Content })
+                });
+
+                if (resimCevap.ok) {
+                    const resimData = await resimCevap.json();
+                    
+                    vitrin.push({
+                        id: Date.now(), url: resimData.content.download_url,
+                        ad: ad, fiyat: fiyat, seri: seri, en: en, boy: boy, slogan: slogan,
+                        tip: "2d-texture" // İleride gerçek 3D model ayırımı yapmak için altyapı
+                    });
+
+                    await jsonGuncelle(vitrin);
+
+                    statusText.innerText = "Başarılı! ✅";
+                    setTimeout(() => statusText.style.display = 'none', 2000);
+                    document.getElementById('fileInput').value = "";
+                    document.getElementById('previewImg').style.display = 'none';
+                    document.querySelectorAll('input').forEach(i => i.value = "");
+                    vitriniCiz();
+                } else {
+                    alert("Yükleme başarısız. GitHub yetkilerini kontrol edin.");
+                }
+            } catch (e) { alert("Bağlantı hatası!"); }
+        };
+    }
+
+    function vitriniCiz() {
+        const listeDiv = document.getElementById('productList');
+        document.getElementById('countBadge').innerText = vitrin.length;
+        listeDiv.innerHTML = "";
+        
+        vitrin.forEach((urun) => {
+            listeDiv.innerHTML += `
+                <div class="product-item">
+                    <img src="${urun.url}" class="thumb">
+                    <div class="info">
+                        <h4>${urun.ad}</h4>
+                        <p>${urun.seri} • ${urun.en}x${urun.boy} cm</p>
+                    </div>
+                    <button class="btn-del" onclick="urunuSil(${urun.id})">Sil</button>
+                </div>
+            `;
+        });
+    }
+
+    async function urunuSil(id) {
+        if (confirm("Bu ürünü kaldırmak istediğinize emin misiniz?")) {
+            vitrin = vitrin.filter(u => u.id !== id);
+            await jsonGuncelle(vitrin);
+            vitriniCiz();
+        }
+    }
+
+    async function jsonGuncelle(data) {
+        const url = `https://api.github.com/repos/${KULLANICI}/${REPO}/contents/vitrin.json`;
+        let sha = "";
+        try {
+            const getCevap = await fetch(url, { headers: { 'Authorization': `token ${githubToken}` } });
+            if (getCevap.ok) { const d = await getCevap.json(); sha = d.sha; }
+        } catch(e) {}
+
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+        await fetch(url, {
+            method: 'PUT',
+            headers: { 'Authorization': `token ${githubToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: "Vitrin Guncellemesi", content: content, sha: sha || undefined })
+        });
+    }
+</script>
+</body>
+</html>
