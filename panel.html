@@ -3,39 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yönetim Paneli | Premium AR Showroom</title>
+    <title>Yönetim Paneli | Pro AR Showroom</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
-        /* ... (CSS kısmın harika, aynı bırakıyoruz, sadece ufak renk rötuşları yapabilirsin) ... */
-        :root {
-            --bg-dark: #09090b; --card-glass: rgba(30, 30, 30, 0.65);
-            --input-bg: rgba(255, 255, 255, 0.08); --accent-color: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.4); --text-main: #ffffff;
-            --text-muted: #a1a1aa; --danger: #ef4444; --border-glass: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: radial-gradient(circle at 50% 0%, #1e1e24 0%, var(--bg-dark) 80%); color: var(--text-main); min-height: 100vh; padding: 20px; overflow-x: hidden; }
+        :root { --bg-dark: #09090b; --card-glass: rgba(30, 30, 30, 0.65); --input-bg: rgba(255, 255, 255, 0.08); --accent-color: #3b82f6; --text-main: #ffffff; --text-muted: #a1a1aa; --danger: #ef4444; --border-glass: 1px solid rgba(255, 255, 255, 0.1); }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: radial-gradient(circle at 50% 0%, #1e1e24 0%, var(--bg-dark) 80%); color: var(--text-main); min-height: 100vh; padding: 20px; }
         .container { max-width: 550px; margin: 0 auto; padding-bottom: 50px; }
         header { text-align: center; margin-bottom: 30px; padding-top: 20px; }
         h2 { font-weight: 800; font-size: 26px; margin: 0; }
-        .subtitle { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
-        .glass-card { background: var(--card-glass); backdrop-filter: blur(20px); border-radius: 24px; border: var(--border-glass); padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); margin-bottom: 25px; }
-        .upload-area { display: flex; flex-direction: column; gap: 15px; }
-        .file-upload-wrapper { position: relative; width: 100%; height: 140px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; transition: 0.3s; background: rgba(0,0,0,0.2); overflow: hidden; }
+        .glass-card { background: var(--card-glass); backdrop-filter: blur(20px); border-radius: 24px; border: var(--border-glass); padding: 25px; margin-bottom: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .file-upload-wrapper { position: relative; width: 100%; height: 140px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; background: rgba(0,0,0,0.2); overflow: hidden; margin-bottom: 15px;}
         .file-upload-wrapper input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;}
-        #previewImg { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; border-radius: 16px; opacity: 0.6; z-index: 1; display: none; }
+        #previewImg { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.6; z-index: 1; display: none; }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        input[type="text"], input[type="number"] { background: var(--input-bg); border: var(--border-glass); color: white; padding: 16px; border-radius: 14px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
+        select, input[type="text"], input[type="number"] { background: var(--input-bg); border: var(--border-glass); color: white; padding: 16px; border-radius: 14px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
+        select option { background: var(--bg-dark); }
         .full-width { grid-column: span 2; }
         .btn-main { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
         #statusText { text-align: center; color: var(--accent-color); font-size: 13px; margin-top: 15px; display: none; font-weight: 600; }
-        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px; }
+        
+        /* Liste & Arşiv Stilleri */
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .product-item { display: flex; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 16px; margin-bottom: 12px; }
-        .thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; margin-right: 15px; }
+        .thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; margin-right: 15px; background: #000; }
         .info { flex: 1; }
         .info h4 { margin: 0 0 4px 0; font-size: 15px; }
         .info p { margin: 0; font-size: 12px; color: var(--text-muted); }
-        .btn-del { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: none; width: 40px; height: 40px; border-radius: 12px; cursor: pointer; }
+        .btn-del { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: none; padding: 10px; border-radius: 12px; cursor: pointer; }
+        
+        .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; margin-top: 15px; }
+        .archive-item { position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden; cursor: pointer; border: 2px solid transparent; }
+        .archive-item:hover { border-color: var(--accent-color); }
+        .archive-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        
+        .actions { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-sec { padding: 15px; border-radius: 14px; cursor: pointer; font-weight: 600; text-align: center; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; }
     </style>
 </head>
 <body>
@@ -43,24 +46,28 @@
 <div class="container">
     <header>
         <h2>YÖNETİM PANELİ</h2>
-        <div class="subtitle">Evrensel AR Vitrin Düzenleyici</div>
+        <div class="subtitle">Sanal Keşif / fth-ar</div>
     </header>
 
-    <div class="glass-card upload-area">
+    <div class="glass-card">
+        <select id="urunTipi" class="full-width" style="margin-bottom: 15px;" onchange="tipGuncelle()">
+            <option value="hali">Zemin / Halı (2D Görsel)</option>
+            <option value="tablo">Duvar / Tablo (2D Görsel)</option>
+            <option value="3dmodel">Mobilya / 3D Obje (.glb Dosyası)</option>
+        </select>
+
         <div class="file-upload-wrapper">
-            <span class="icon-cam">📸</span>
-            <span class="upload-text">Ürün Görseli Seç</span>
+            <span class="upload-text" id="uploadLabel">Görsel veya .glb Seç</span>
             <img id="previewImg">
-            <input type="file" id="fileInput" accept="image/*" onchange="onFileSelected(this)">
+            <input type="file" id="fileInput" accept="image/*,.glb" onchange="onFileSelected(this)">
         </div>
 
         <div class="input-grid">
             <input type="text" id="urunAdi" class="full-width" placeholder="Ürün Adı" required>
-            <input type="text" id="seri" placeholder="Kategori" required>
             <input type="text" id="fiyat" placeholder="Fiyat" required>
-            <input type="number" id="enInput" placeholder="En (cm)" required>
-            <input type="number" id="boyInput" placeholder="Boy (cm)" required>
-            <input type="text" id="slogan" class="full-width" placeholder="Kısa Açıklama / Slogan">
+            <input type="text" id="seri" placeholder="Kategori" required>
+            <input type="number" id="enInput" placeholder="En (cm)">
+            <input type="number" id="boyInput" placeholder="Boy (cm)">
         </div>
 
         <button class="btn-main" onclick="urunuYukle()">VİTRİNE EKLE</button>
@@ -69,35 +76,56 @@
 
     <div class="list-header">
         <h3>Yayındaki Ürünler</h3>
-        <span class="badge" id="countBadge" style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px;">0</span>
+        <span id="countBadge" style="background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px;">0</span>
     </div>
     <div id="productList"></div>
+
+    <div class="glass-card" id="archiveSection" style="display:none; margin-top:30px;">
+        <h3 style="color: var(--text-muted); font-size:14px; margin:0;">☁️ Bulut Arşivi (Kullanılmayanlar)</h3>
+        <div class="archive-grid" id="archiveGrid"></div>
+    </div>
+
+    <div class="actions">
+        <div class="btn-sec" style="background: #25D366; color: white; border: none;" onclick="linkPaylas()">📲 Showroom Linkini Paylaş</div>
+        <div class="btn-sec" style="color: var(--danger); border-color: rgba(239,68,68,0.3);" onclick="tumunuTemizle()">🗑️ Tüm Vitrini Temizle</div>
+    </div>
 </div>
 
 <script>
-    // --- GITHUB AYARLARI ---
     const KULLANICI = "fthlabz"; 
     const REPO = "fth-ar"; 
     
-    // --- HAYALET KİLİT MİMARİSİ ---
+    // Standart Şifre Çözücü
     const sifreliKasa = "U2FsdGVkX19mc0X7xpzonbEzWQgJl2dp+4Oqrqhg6zeA49eOwhvOSgJsBs2IQkLhw61Ilvvd6nS1CVjkJ+0bnA=="; 
     const gizliPin = "1453"; 
-    const bytes = CryptoJS.AES.decrypt(sifreliKasa, gizliPin);
-    const githubToken = bytes.toString(CryptoJS.enc.Utf8); 
-    // -----------------------
+    const githubToken = CryptoJS.AES.decrypt(sifreliKasa, gizliPin).toString(CryptoJS.enc.Utf8); 
 
     let vitrin = [];
 
+    function tipGuncelle() {
+        const tip = document.getElementById('urunTipi').value;
+        const accept = tip === '3dmodel' ? '.glb' : 'image/*';
+        document.getElementById('fileInput').setAttribute('accept', accept);
+        document.getElementById('uploadLabel').innerText = tip === '3dmodel' ? '3D Model (.glb) Seç' : '2D Görsel Seç';
+        
+        // 3D Modelde en/boy girmeye gerek yok (modelin kendi boyutu kullanılır)
+        document.getElementById('enInput').disabled = (tip === '3dmodel');
+        document.getElementById('boyInput').disabled = (tip === '3dmodel');
+    }
+
     function onFileSelected(input) {
         const file = input.files[0];
-        if (file) {
+        const tip = document.getElementById('urunTipi').value;
+        if (file && tip !== '3dmodel') {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.getElementById('previewImg');
-                img.src = e.target.result;
-                img.style.display = 'block';
+            reader.onload = e => {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('previewImg').style.display = 'block';
             }
             reader.readAsDataURL(file);
+        } else if (file && tip === '3dmodel') {
+            document.getElementById('uploadLabel').innerText = file.name + " Seçildi";
+            document.getElementById('previewImg').style.display = 'none';
         }
     }
 
@@ -105,7 +133,8 @@
         try {
             const cevap = await fetch(`https://raw.githubusercontent.com/${KULLANICI}/${REPO}/main/vitrin.json?t=${Date.now()}`);
             if (cevap.ok) { vitrin = await cevap.json(); vitriniCiz(); }
-        } catch (e) { console.log("Veri okunamadı."); }
+        } catch (e) { console.log("Vitrin boş veya okunamadı."); }
+        arsiviGetir();
     }
     sistemiBaslat();
 
@@ -116,111 +145,149 @@
         const seri = document.getElementById('seri').value;
         const en = document.getElementById('enInput').value;
         const boy = document.getElementById('boyInput').value;
-        const slogan = document.getElementById('slogan').value;
+        const tip = document.getElementById('urunTipi').value;
 
-        if (!file || !ad || !fiyat || !en || !boy) { 
-            alert("Lütfen resim, ürün adı, fiyat ve ölçüleri eksiksiz girin."); 
-            return; 
-        }
+        if (!file || !ad || !fiyat) { alert("Eksik bilgi girdiniz!"); return; }
+        if (tip !== '3dmodel' && (!en || !boy)) { alert("2D görseller için En ve Boy zorunludur."); return; }
 
         const statusText = document.getElementById('statusText');
         statusText.style.display = "block";
-        statusText.innerText = "Görsel Optimize Ediliyor... ⚙️";
+        statusText.innerText = "İşleniyor... ⏳";
 
-        const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.src = url;
+        let base64Content = "";
+        let dosyaAdi = "";
 
-        img.onload = async function() {
+        if (tip === '3dmodel') {
+            // GLB Yükleme Doğrudan
+            const buffer = await file.arrayBuffer();
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) { binary += String.fromCharCode(bytes[i]); }
+            base64Content = window.btoa(binary);
+            dosyaAdi = `model_${Date.now()}.glb`;
+        } else {
+            // 2D Görsel Yükleme (Canvas ile Sıkıştırma)
+            const url = URL.createObjectURL(file);
+            const img = await new Promise((resolve) => {
+                const i = new Image(); i.onload = () => resolve(i); i.src = url;
+            });
             URL.revokeObjectURL(url);
             
             const canvas = document.createElement('canvas');
-            const MAX_BOYUT = 1500;
             let w = img.width, h = img.height;
-            if (w > h) { if (w > MAX_BOYUT) { h *= MAX_BOYUT/w; w = MAX_BOYUT; } }
-            else { if (h > MAX_BOYUT) { w *= MAX_BOYUT/h; h = MAX_BOYUT; } }
-            
+            if (w > 1500 || h > 1500) { if (w > h) { h *= 1500/w; w = 1500; } else { w *= 1500/h; h = 1500; } }
             canvas.width = w; canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            
-            const base64Content = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
-            const dosyaAdi = `urun_${Date.now()}.jpg`;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            base64Content = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+            dosyaAdi = `gorsel_${Date.now()}.jpg`;
+        }
 
-            statusText.innerText = "Buluta Yükleniyor... ☁️";
+        statusText.innerText = "Buluta Yükleniyor... ☁️";
 
-            try {
-                const resimCevap = await fetch(`https://api.github.com/repos/${KULLANICI}/${REPO}/contents/images/${dosyaAdi}`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': `token ${githubToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: "Sanal Kesif Upload", content: base64Content })
+        try {
+            const resimCevap = await fetch(`https://api.github.com/repos/${KULLANICI}/${REPO}/contents/images/${dosyaAdi}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${githubToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: "Urun Yukleme", content: base64Content })
+            });
+
+            if (resimCevap.ok) {
+                const resimData = await resimCevap.json();
+                vitrin.push({
+                    id: Date.now(), url: resimData.content.download_url,
+                    ad: ad, fiyat: fiyat, seri: seri, en: en || "0", boy: boy || "0", tip: tip
                 });
+                await jsonGuncelle(vitrin);
+                statusText.innerText = "Başarılı! ✅";
+                setTimeout(() => statusText.style.display = 'none', 2000);
+                vitriniCiz();
+                arsiviGetir();
+            } else { alert("GitHub Yükleme Hatası!"); }
+        } catch (e) { alert("Bağlantı hatası!"); }
+    }
 
-                if (resimCevap.ok) {
-                    const resimData = await resimCevap.json();
-                    
-                    vitrin.push({
-                        id: Date.now(), url: resimData.content.download_url,
-                        ad: ad, fiyat: fiyat, seri: seri, en: en, boy: boy, slogan: slogan,
-                        tip: "2d-texture" // İleride gerçek 3D model ayırımı yapmak için altyapı
-                    });
+    async function arsiviGetir() {
+        try {
+            const cevap = await fetch(`https://api.github.com/repos/${KULLANICI}/${REPO}/contents/images`, {
+                headers: { 'Authorization': `token ${githubToken}` }
+            });
+            if (cevap.ok) {
+                const dosyalar = await cevap.json();
+                const vitrinUrlleri = vitrin.map(u => u.url);
+                const arsiv = dosyalar.filter(d => d.name.match(/\.(jpg|jpeg|png|webp|glb)$/i) && !vitrinUrlleri.includes(d.download_url));
+                
+                const grid = document.getElementById('archiveGrid');
+                const section = document.getElementById('archiveSection');
+                
+                if(arsiv.length === 0) { section.style.display = 'none'; return; }
+                section.style.display = 'block'; grid.innerHTML = "";
+                
+                arsiv.forEach(d => {
+                    const is3D = d.name.endsWith('.glb');
+                    const imgTag = is3D ? `<div style="width:100%;height:100%;background:#333;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;">3D</div>` : `<img src="${d.download_url}">`;
+                    grid.innerHTML += `<div class="archive-item" onclick="arsivdenEkle('${d.download_url}', ${is3D})">${imgTag}</div>`;
+                });
+            }
+        } catch (e) { }
+    }
 
-                    await jsonGuncelle(vitrin);
-
-                    statusText.innerText = "Başarılı! ✅";
-                    setTimeout(() => statusText.style.display = 'none', 2000);
-                    document.getElementById('fileInput').value = "";
-                    document.getElementById('previewImg').style.display = 'none';
-                    document.querySelectorAll('input').forEach(i => i.value = "");
-                    vitriniCiz();
-                } else {
-                    alert("Yükleme başarısız. GitHub yetkilerini kontrol edin.");
-                }
-            } catch (e) { alert("Bağlantı hatası!"); }
-        };
+    async function arsivdenEkle(url, is3D) {
+        const ad = prompt("Ürün Adı:"); if(!ad) return;
+        const fiyat = prompt("Fiyatı:"); if(!fiyat) return;
+        let en = "0", boy = "0", tip = is3D ? "3dmodel" : "hali";
+        
+        if (!is3D) {
+            tip = confirm("Bu görsel Tablo/Duvar için mi? (İptal derseniz Halı/Zemin olur)") ? "tablo" : "hali";
+            en = prompt("En (cm):"); boy = prompt("Boy (cm):");
+        }
+        
+        vitrin.push({ id: Date.now(), url: url, ad: ad, fiyat: fiyat, seri: "Arşiv", en: en, boy: boy, tip: tip });
+        await jsonGuncelle(vitrin);
+        vitriniCiz(); arsiviGetir();
     }
 
     function vitriniCiz() {
         const listeDiv = document.getElementById('productList');
         document.getElementById('countBadge').innerText = vitrin.length;
         listeDiv.innerHTML = "";
-        
         vitrin.forEach((urun) => {
+            const etiket = urun.tip === '3dmodel' ? "3D Model" : (urun.tip === 'tablo' ? "Tablo" : "Halı");
             listeDiv.innerHTML += `
                 <div class="product-item">
-                    <img src="${urun.url}" class="thumb">
+                    <div class="thumb" style="background-image:url('${urun.url}'); background-size:cover;"></div>
                     <div class="info">
                         <h4>${urun.ad}</h4>
-                        <p>${urun.seri} • ${urun.en}x${urun.boy} cm</p>
+                        <p>[${etiket}] ${urun.tip !== '3dmodel' ? `• ${urun.en}x${urun.boy} cm` : ''}</p>
                     </div>
                     <button class="btn-del" onclick="urunuSil(${urun.id})">Sil</button>
-                </div>
-            `;
+                </div>`;
         });
     }
 
     async function urunuSil(id) {
-        if (confirm("Bu ürünü kaldırmak istediğinize emin misiniz?")) {
+        if (confirm("Kaldırmak istediğinize emin misiniz?")) {
             vitrin = vitrin.filter(u => u.id !== id);
             await jsonGuncelle(vitrin);
-            vitriniCiz();
+            vitriniCiz(); arsiviGetir();
         }
+    }
+
+    async function tumunuTemizle() {
+        if(confirm("TÜM VİTRİN SİLİNECEK! Emin misiniz?")) {
+            vitrin = []; await jsonGuncelle(vitrin); vitriniCiz(); arsiviGetir();
+        }
+    }
+
+    function linkPaylas() {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('Sanal Keşif Showroom:\n👉 https://' + KULLANICI + '.github.io/' + REPO + '/index.html')}`, '_blank');
     }
 
     async function jsonGuncelle(data) {
         const url = `https://api.github.com/repos/${KULLANICI}/${REPO}/contents/vitrin.json`;
         let sha = "";
-        try {
-            const getCevap = await fetch(url, { headers: { 'Authorization': `token ${githubToken}` } });
-            if (getCevap.ok) { const d = await getCevap.json(); sha = d.sha; }
-        } catch(e) {}
-
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-        await fetch(url, {
-            method: 'PUT',
-            headers: { 'Authorization': `token ${githubToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: "Vitrin Guncellemesi", content: content, sha: sha || undefined })
-        });
+        try { const r = await fetch(url, { headers: { 'Authorization': `token ${githubToken}` } }); if (r.ok) { sha = (await r.json()).sha; } } catch(e) {}
+        await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${githubToken}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ message: "Guncelleme", content: btoa(unescape(encodeURIComponent(JSON.stringify(data)))), sha: sha || undefined }) });
     }
 </script>
 </body>
